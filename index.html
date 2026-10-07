@@ -1,269 +1,730 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portal Presensi SPS 134 | Teknik Elektro ITS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="Logo Angkatan Elektro ITS 2025.jpeg">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="icon" href="Logo Angkatan Elektro ITS 2025.jpeg" />
     <style>
-        :root {
-            --primary: #0ea5e9;
-            --primary-dark: #0284c7;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+      :root {
+        --primary: #0ea5e9;
+        --primary-dark: #0284c7;
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+      }
+
+      /* Header & Navbar */
+      header {
+        background: var(--card-bg);
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
+      header h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      header p {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      /* Rekapitulasi / Statistik */
+      .rekap-wrapper {
+        max-width: 1200px;
+        margin: 20px auto 0;
+        padding: 0 15px;
+      }
+      .rekap-container {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .rekap-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .rekap-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 15px;
+        min-width: 100px;
+        text-align: center;
+        flex: 1;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+      .rekap-card .label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .rekap-card .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      /* Highlight khusus untuk Alpa */
+      .rekap-card.alpa {
+        background: #fff1f2;
+        border-color: #fecdd3;
+      }
+      .rekap-card.alpa .label {
+        color: #be123c;
+      }
+      .rekap-card.alpa .value {
+        color: #e11d48;
+      }
+
+      /* Tab Navigation (Scrollable di HP) */
+      .tabs-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 15px;
+        overflow-x: auto;
+        white-space: nowrap;
+        /* Sembunyikan scrollbar tapi tetap bisa di-scroll */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .tabs-container::-webkit-scrollbar {
+        display: none;
+      }
+      .tabs {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
+      }
+
+      @media (min-width: 768px) {
+        .tabs {
+          justify-content: center;
+        }
+      } /* Tengah di layar lebar */
+
+      .tab-btn {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 10px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+      }
+      .tab-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .tab-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+      }
+
+      /* Main Content */
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px 40px;
+      }
+
+      /* Grid Cards */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-img-wrapper {
+        width: 100%;
+        height: 200px;
+        background: #f1f5f9;
+        position: relative;
+        cursor: zoom-in;
+      }
+      .card-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .no-img {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .card-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .card-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .card-title h3 {
+        font-size: 1.1rem;
+        line-height: 1.3;
+      }
+      .badge {
+        background: #f1f5f9;
+        color: var(--primary-dark);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .card-info {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+        flex-grow: 1;
+      }
+      .card-info p {
+        margin-bottom: 4px;
+      }
+
+      .btn-wa {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #25d366;
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: opacity 0.2s;
+      }
+      .btn-wa:hover {
+        opacity: 0.9;
+      }
+
+      /* Loading State */
+      .loader-container {
+        text-align: center;
+        padding: 40px;
+        display: none;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+        display: none;
+        grid-column: 1 / -1;
+      }
+
+      /* Lightbox (Zoom & PDF Preview) */
+      .lightbox {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .lightbox-content {
+        width: 95%;
+        max-width: 800px;
+        height: 80vh;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        position: relative;
+      }
+      .lightbox iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      .close-lightbox {
+        color: white;
+        font-size: 35px;
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .lightbox-caption {
+        color: white;
+        margin-top: 15px;
+        font-size: 1rem;
+      }
+      .floating-controls {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+      }
+
+      .sync-control {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      }
+
+      .refresh-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 13px;
+        border: 0;
+        border-right: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-main);
+        font-family: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .refresh-btn:hover {
+        background: var(--primary-light);
+        color: var(--primary-dark);
+      }
+
+      .refresh-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .sync-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 13px;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        white-space: nowrap;
+      }
+
+      .pending-update {
+        display: none;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 13px;
+        border: 1px solid var(--primary);
+        border-radius: 12px;
+        background: var(--primary);
+        color: white;
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+      }
+
+      .pending-update strong {
+        font-weight: 700;
+      }
+
+      .scroll-top-btn {
+        display: none;
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        background: var(--card-bg);
+        color: var(--text-main);
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      }
+
+      .scroll-top-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      @media (max-width: 600px) {
+        .floating-controls {
+          right: 12px;
+          bottom: 12px;
+          left: 12px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); }
-
-        /* Header & Navbar */
-        header {
-            background: var(--card-bg);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-        header h1 { font-size: 1.25rem; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; justify-content: center; gap: 8px; }
-        header p { font-size: 0.875rem; color: var(--text-muted); margin-top: 4px; }
-
-        /* Rekapitulasi / Statistik */
-        .rekap-wrapper { max-width: 1200px; margin: 20px auto 0; padding: 0 15px; }
-        .rekap-container {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;
-            -ms-overflow-style: none; scrollbar-width: none;
-        }
-        .rekap-container::-webkit-scrollbar { display: none; }
-        
-        .rekap-card {
-            background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
-            padding: 12px 15px; min-width: 100px; text-align: center; flex: 1;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .rekap-card .label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 4px; }
-        .rekap-card .value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        
-        /* Highlight khusus untuk Alpa */
-        .rekap-card.alpa { background: #fff1f2; border-color: #fecdd3; }
-        .rekap-card.alpa .label { color: #be123c; }
-        .rekap-card.alpa .value { color: #e11d48; }
-
-        /* Tab Navigation (Scrollable di HP) */
-        .tabs-container {
-            max-width: 1200px; margin: 20px auto; padding: 0 15px;
-            overflow-x: auto; white-space: nowrap;
-            /* Sembunyikan scrollbar tapi tetap bisa di-scroll */
-            -ms-overflow-style: none; scrollbar-width: none;
-        }
-        .tabs-container::-webkit-scrollbar { display: none; }
-        .tabs { display: flex; gap: 10px; justify-content: flex-start; }
-        
-        @media (min-width: 768px) { .tabs { justify-content: center; } } /* Tengah di layar lebar */
-
-        .tab-btn {
-            background: var(--card-bg); border: 1px solid var(--border);
-            padding: 10px 20px; border-radius: 50px; cursor: pointer;
-            font-weight: 600; font-size: 0.9rem; color: var(--text-muted);
-            transition: all 0.3s ease;
-        }
-        .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
-
-        /* Main Content */
-        main { max-width: 1200px; margin: 0 auto; padding: 0 15px 40px; }
-        
-        /* Grid Cards */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+        .sync-control {
+          max-width: 100%;
         }
 
-        .card {
-            background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);
-            overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
-            display: flex; flex-direction: column;
+        .sync-status {
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1); }
-        
-        .card-img-wrapper { width: 100%; height: 200px; background: #f1f5f9; position: relative; cursor: zoom-in; }
-        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .no-img { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 0.9rem; flex-direction: column; gap: 8px; }
 
-        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-        .card-title h3 { font-size: 1.1rem; line-height: 1.3; }
-        .badge { background: #f1f5f9; color: var(--primary-dark); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
-        
-        .card-info { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; flex-grow: 1; }
-        .card-info p { margin-bottom: 4px; }
-        
-        .btn-wa {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: #25D366; color: white; text-decoration: none;
-            padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
-            transition: opacity 0.2s;
+        .pending-update {
+          max-width: 100%;
         }
-        .btn-wa:hover { opacity: 0.9; }
-
-        /* Loading State */
-        .loader-container { text-align: center; padding: 40px; display: none; }
-        .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Empty State */
-        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); display: none; grid-column: 1 / -1; }
-
-        /* Lightbox (Zoom & PDF Preview) */
-        .lightbox {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); z-index: 999;
-            align-items: center; justify-content: center; flex-direction: column;
-        }
-        .lightbox-content {
-            width: 95%; max-width: 800px; height: 80vh; 
-            background: #fff; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative;
-        }
-        .lightbox iframe { width: 100%; height: 100%; border: none; }
-        .close-lightbox { color: white; font-size: 35px; position: absolute; top: 15px; right: 25px; cursor: pointer; font-weight: bold; }
-        .lightbox-caption { color: white; margin-top: 15px; font-size: 1rem; }
-
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <h1><i class="fa-solid fa-bolt"></i> Portal Validasi Presensi Latihan SPS 134 - Day 21</h1>
-        <p>Sistem Pengecekan Kehadiran & Izin IONICS</p>
+      <h1>
+        <i class="fa-solid fa-bolt"></i>
+        <span id="portal-title"></span>
+      </h1>
+      <p>Sistem Pengecekan Kehadiran & Izin IONICS</p>
     </header>
 
     <!-- Area Rekapitulasi -->
-    <div class="rekap-wrapper">
-        <div class="rekap-container">
-            <div class="rekap-card">
-                <span class="label">Total</span>
-                <span class="value">284</span>
-            </div>
-            <div class="rekap-card">
-                <span class="label">Hadir</span>
-                <span class="value" id="rek-hadir">...</span>
-            </div>
-            <div class="rekap-card">
-                <span class="label">Sakit</span>
-                <span class="value" id="rek-sakit">...</span>
-            </div>
-            <div class="rekap-card">
-                <span class="label">Agama</span>
-                <span class="value" id="rek-keagamaan">...</span>
-            </div>
-            <div class="rekap-card">
-                <span class="label">Duka</span>
-                <span class="value" id="rek-berduka">...</span>
-            </div>
-            <div class="rekap-card">
-                <span class="label">Akademik</span>
-                <span class="value" id="rek-akademik">...</span>
-            </div>
-            <div class="rekap-card alpa">
-                <span class="label">Alpa</span>
-                <span class="value" id="rek-alpa">...</span>
-            </div>
-        </div>
+    <div class="rekap-container" id="rekap-container">
+      <div class="rekap-card">
+        <span class="label">Total</span>
+        <span class="value" id="rek-total"></span>
+      </div>
+
+      <div class="rekap-card alpa" id="rekap-alpa-card">
+        <span class="label">Alpa</span>
+        <span class="value" id="rek-alpa">...</span>
+      </div>
     </div>
 
     <div class="tabs-container">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="changeTab('HADIR', this)">Hadir</button>
-            <button class="tab-btn" onclick="changeTab('SAKIT', this)">Sakit</button>
-            <button class="tab-btn" onclick="changeTab('KEAGAMAAN', this)">Keagamaan</button>
-            <button class="tab-btn" onclick="changeTab('BERDUKA', this)">Berduka</button>
-            <button class="tab-btn" onclick="changeTab('AKADEMIK', this)">Akademik</button>
-            <!-- Tambahan Tab Belum Presensi -->
-            <button class="tab-btn" onclick="changeTab('BELUM PRESENSI', this)">Belum Presensi</button>
-        </div>
+      <div class="tabs" id="attendance-tabs"></div>
     </div>
 
     <main>
-        <div class="loader-container" id="loader">
-            <div class="spinner"></div>
-            <p>Menyinkronkan data dari Google Sheets...</p>
-        </div>
-        
-        <div class="grid" id="dataContainer"></div>
-        
-        <div class="empty-state" id="emptyState">
-            <i class="fa-regular fa-folder-open fa-3x" style="margin-bottom: 15px;"></i>
-            <h3>Belum Ada Data</h3>
-            <p>Tidak ada data peserta pada kategori ini.</p>
-        </div>
+      <div class="loader-container" id="loader">
+        <div class="spinner"></div>
+        <p>Menyinkronkan data dari Google Sheets...</p>
+      </div>
+
+      <div class="grid" id="dataContainer"></div>
+
+      <div class="empty-state" id="emptyState">
+        <i
+          class="fa-regular fa-folder-open fa-3x"
+          style="margin-bottom: 15px"
+        ></i>
+        <h3>Belum Ada Data</h3>
+        <p>Tidak ada data peserta pada kategori ini.</p>
+      </div>
     </main>
 
     <!-- Lightbox Modal -->
     <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-        <span class="close-lightbox" onclick="closeLightbox()">&times;</span>
-        <div class="lightbox-content" onclick="event.stopPropagation()">
-            <iframe id="lightboxIframe" src=""></iframe>
-        </div>
-        <div class="lightbox-caption" id="lightboxCaption"></div>
+      <span class="close-lightbox" onclick="closeLightbox()">&times;</span>
+      <div class="lightbox-content" onclick="event.stopPropagation()">
+        <iframe id="lightboxIframe" src=""></iframe>
+      </div>
+      <div class="lightbox-caption" id="lightboxCaption"></div>
     </div>
 
+    <div class="floating-controls">
+      <button
+        class="scroll-top-btn"
+        id="scroll-top-btn"
+        type="button"
+        onclick="scrollToTop()"
+        title="Kembali ke atas"
+        aria-label="Kembali ke atas"
+      >
+        <i class="fa-solid fa-arrow-up"></i>
+      </button>
+
+      <button
+        class="pending-update"
+        id="pending-update"
+        type="button"
+        onclick="applyPendingUpdate()"
+      >
+        <i class="fa-solid fa-circle-arrow-up"></i>
+        <span>Data baru tersedia</span>
+        <strong>Tampilkan</strong>
+      </button>
+
+      <div class="sync-control">
+        <button
+          class="refresh-btn"
+          id="refresh-btn"
+          type="button"
+          onclick="handleManualRefresh()"
+          title="Refresh data"
+        >
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>Refresh</span>
+        </button>
+
+        <div class="sync-status">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span id="last-synced">Belum disinkronkan</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="config.js"></script>
     <script>
-        // === GANTI URL DI BAWAH INI DENGAN WEB APP URL ANDA ===
-        const API_URL = "https://script.google.com/macros/s/AKfycbzUA5uGuhezSLPqf3IvrcY-mnlqv_VKUWlSPvUMKpV77WS0SHaIZSi0eRLTvmDyDcXrHQ/exec"; 
-        // =======================================================
+      // === GANTI URL DI BAWAH INI DENGAN WEB APP URL ANDA ===
+      const API_URL = APP_CONFIG.api.url;
+      // =======================================================
+      document.getElementById("portal-title").textContent =
+        `${APP_CONFIG.portalTitle} ${APP_CONFIG.event.name}`;
 
-        let currentTab = 'HADIR';
+      document.getElementById("rek-total").textContent =
+        APP_CONFIG.event.participantCount;
 
-        // Konversi URL Drive biasa menjadi URL Direct Download (Bisa dirender img src)
-        function getDriveFileId(url) {
-            if (!url) return null;
-            const match = url.match(/id=([^&]+)/) || url.match(/d\/([a-zA-Z0-9_-]+)/);
-            return match ? match[1] : null;
+      const rekapContainer = document.getElementById("rekap-container");
+      const alpaCard = document.getElementById("rekap-alpa-card");
+
+      APP_CONFIG.attendanceCategories.forEach((category) => {
+        const card = document.createElement("div");
+        card.className = "rekap-card";
+
+        card.innerHTML = `
+    <span class="label">${category.label}</span>
+    <span class="value" id="rek-${category.id.toLowerCase()}">...</span>
+  `;
+
+        rekapContainer.insertBefore(card, alpaCard);
+      });
+
+      let currentTab = APP_CONFIG.attendanceCategories[0].id;
+
+      const sheetCache = new Map();
+      const renderedDataSnapshots = new Map();
+      let renderedSheet = null;
+      let pendingDataUpdate = null;
+      const CACHE_TTL = 30_000; // 30 detik
+
+      function fetchSheet(sheetName, forceRefresh = false) {
+        const cached = sheetCache.get(sheetName);
+        const now = Date.now();
+
+        if (!forceRefresh && cached && now - cached.timestamp < CACHE_TTL) {
+          return cached.promise;
         }
 
-        async function loadData(sheetName) {
-            const container = document.getElementById("dataContainer");
-            const loader = document.getElementById("loader");
-            const emptyState = document.getElementById("emptyState");
-            
-            container.innerHTML = "";
-            emptyState.style.display = "none";
-            loader.style.display = "block";
+        const request = fetch(`${API_URL}?sheet=${sheetName}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
 
-            try {
-                const response = await fetch(`${API_URL}?sheet=${sheetName}`);
-                const data = await response.json();
-                loader.style.display = "none";
+            return response.json();
+          })
+          .catch((error) => {
+            // Hapus hanya jika request yang gagal masih merupakan cache terbaru.
+            if (sheetCache.get(sheetName)?.promise === request) {
+              sheetCache.delete(sheetName);
+            }
 
-                let hasValidData = false;
+            throw error;
+          });
 
-                data.forEach(peserta => {
-                    // Abaikan jika nama/NRP kosong atau jika Nama adalah error dari rumus
-                    if(!peserta.Nama || !peserta.NRP || peserta.Nama === "#N/A" || peserta.Nama === "#REF!") return; 
-                    hasValidData = true;
-                    
-                    const fileId = getDriveFileId(peserta["Bukti Foto"]);
-                    const card = document.createElement("div");
-                    card.className = "card";
-                    
-                    let imgArea = '';
-                    
-                    // Hanya render kotak gambar jika bukan tab BELUM PRESENSI
-                    if (sheetName !== 'BELUM PRESENSI') {
-                        if (fileId) {
-                            const thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w600`;
-                            const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-                            
-                            imgArea = `
+        sheetCache.set(sheetName, {
+          timestamp: now,
+          promise: request,
+        });
+
+        return request;
+      }
+
+      const tabsContainer = document.getElementById("attendance-tabs");
+
+      APP_CONFIG.attendanceCategories.forEach((category, index) => {
+        const button = document.createElement("button");
+
+        button.className = `tab-btn${index === 0 ? " active" : ""}`;
+        button.textContent = category.label;
+        button.onclick = () => changeTab(category.id, button);
+
+        tabsContainer.appendChild(button);
+      });
+
+      const unsubmittedCategory = APP_CONFIG.unsubmittedCategory;
+      const unsubmittedButton = document.createElement("button");
+
+      unsubmittedButton.className = "tab-btn";
+      unsubmittedButton.textContent = unsubmittedCategory.label;
+      unsubmittedButton.onclick = () =>
+        changeTab(unsubmittedCategory.id, unsubmittedButton);
+
+      tabsContainer.appendChild(unsubmittedButton);
+
+      // Konversi URL Drive biasa menjadi URL Direct Download (Bisa dirender img src)
+      function getDriveFileId(url) {
+        if (!url) return null;
+        const match =
+          url.match(/id=([^&]+)/) || url.match(/d\/([a-zA-Z0-9_-]+)/);
+        return match ? match[1] : null;
+      }
+
+      async function loadData(sheetName, forceRefresh = false) {
+        const container = document.getElementById("dataContainer");
+        const loader = document.getElementById("loader");
+        const emptyState = document.getElementById("emptyState");
+
+        // Loading screen hanya ditampilkan jika belum ada data yang sedang tampil.
+        const isInitialLoad =
+          container.children.length === 0 || renderedSheet !== sheetName;
+
+        if (isInitialLoad) {
+          emptyState.style.display = "none";
+          loader.style.display = "block";
+        }
+
+        try {
+          const data = await fetchSheet(sheetName, forceRefresh);
+
+          if (isInitialLoad) {
+            loader.style.display = "none";
+          }
+
+          const dataSnapshot = JSON.stringify(data);
+          const previousSnapshot = renderedDataSnapshots.get(sheetName);
+
+          // Data dari server sama dengan yang sudah tampil.
+          // Jangan menyentuh DOM agar posisi scroll tidak terganggu.
+          if (!isInitialLoad && previousSnapshot === dataSnapshot) {
+            return;
+          }
+
+          // Jika data berubah saat user sedang melihat list,
+          // simpan update terlebih dahulu agar tidak mengganggu posisi baca.
+          if (!isInitialLoad && renderedSheet === sheetName) {
+            pendingDataUpdate = {
+              sheetName,
+              data,
+              snapshot: dataSnapshot,
+            };
+
+            showPendingUpdate();
+            return;
+          }
+
+          let hasValidData = false;
+
+          const fragment = document.createDocumentFragment();
+
+          data.forEach((peserta) => {
+            // Abaikan jika nama/NRP kosong atau jika Nama adalah error dari rumus
+            if (
+              !peserta.Nama ||
+              !peserta.NRP ||
+              peserta.Nama === "#N/A" ||
+              peserta.Nama === "#REF!"
+            )
+              return;
+            hasValidData = true;
+
+            const fileId = getDriveFileId(peserta["Bukti Foto"]);
+            const card = document.createElement("div");
+            card.className = "card";
+
+            let imgArea = "";
+
+            // Hanya render kotak gambar untuk kategori presensi
+            if (sheetName !== APP_CONFIG.unsubmittedCategory.id) {
+              if (fileId) {
+                const thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w600`;
+                const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+
+                imgArea = `
                                 <div class="card-img-wrapper" onclick="openLightbox('${previewUrl}', '${peserta.Nama}')">
                                     <img src="${thumbnailUrl}" alt="Bukti ${peserta.Nama}" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Format+PDF/Tdk+Didukung';">
                                 </div>
@@ -271,8 +732,8 @@
                                     <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka File Asli
                                 </a>
                             `;
-                        } else {
-                            imgArea = `
+              } else {
+                imgArea = `
                                 <div class="card-img-wrapper" style="cursor:default;">
                                     <div class="no-img">
                                         <i class="fa-solid fa-image-slash fa-2x"></i>
@@ -280,21 +741,24 @@
                                     </div>
                                 </div>
                             `;
-                        }
-                    }
+              }
+            }
 
-                    let waLink = peserta['Nomor Telepon'] || '#';
-                    let waBtnText = waLink !== '#' ? 'Hubungi Peserta' : 'Nomor Tidak Tersedia';
-                    
-                    // Ekstrak data dari kolom Keterangan khusus untuk Belum Presensi
-                    let ketText = peserta['Keterangan'] ? `<p><strong>Ket:</strong> <span style="color:#e11d48; font-weight:600; text-transform:capitalize;">${peserta['Keterangan']}</span></p>` : '';
-                    
-                    card.innerHTML = `
+            let waLink = peserta["Nomor Telepon"] || "#";
+            let waBtnText =
+              waLink !== "#" ? "Hubungi Peserta" : "Nomor Tidak Tersedia";
+
+            // Ekstrak data dari kolom Keterangan khusus untuk Belum Presensi
+            let ketText = peserta["Keterangan"]
+              ? `<p><strong>Ket:</strong> <span style="color:#e11d48; font-weight:600; text-transform:capitalize;">${peserta["Keterangan"]}</span></p>`
+              : "";
+
+            card.innerHTML = `
                         ${imgArea}
                         <div class="card-body">
                             <div class="card-title">
                                 <h3>${peserta.Nama}</h3>
-                                <span class="badge">${peserta.FGD || '-'}</span>
+                                <span class="badge">${peserta.FGD || "-"}</span>
                             </div>
                             <div class="card-info">
                                 <p><strong>NRP:</strong> ${peserta.NRP}</p>
@@ -305,87 +769,229 @@
                             </a>
                         </div>
                     `;
-                    container.appendChild(card);
-                });
+            fragment.appendChild(card);
+          });
 
-                if (!hasValidData) emptyState.style.display = "block";
+          if (hasValidData) {
+            container.replaceChildren(fragment);
+            emptyState.style.display = "none";
+          } else {
+            container.replaceChildren();
+            emptyState.style.display = "block";
+          }
 
-            } catch (error) {
-                loader.style.display = "none";
-                emptyState.innerHTML = `<i class="fa-solid fa-triangle-exclamation fa-3x"></i><h3>Gagal Memuat Data</h3><p>Periksa koneksi internet atau Web App URL Anda.</p>`;
-                emptyState.style.display = "block";
-                console.error("Error fetching data:", error);
-            }
+          renderedDataSnapshots.set(sheetName, dataSnapshot);
+          renderedSheet = sheetName;
+        } catch (error) {
+          loader.style.display = "none";
+
+          // Jangan hilangkan data lama jika background refresh gagal.
+          if (container.children.length === 0) {
+            emptyState.innerHTML = `<i class="fa-solid fa-triangle-exclamation fa-3x"></i><h3>Gagal Memuat Data</h3><p>Periksa koneksi internet atau Web App URL Anda.</p>`;
+            emptyState.style.display = "block";
+          }
+
+          console.error("Error fetching data:", error);
         }
+      }
 
-        function changeTab(sheetName, btnElement) {
-            if (currentTab === sheetName) return;
-            currentTab = sheetName;
-            
-            // Update UI Tab Aktif
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-            
-            loadData(sheetName);
+      function changeTab(sheetName, btnElement) {
+        if (currentTab === sheetName) return;
+
+        pendingDataUpdate = null;
+        hidePendingUpdate();
+
+        currentTab = sheetName;
+
+        // Update UI Tab Aktif
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        btnElement.classList.add("active");
+
+        loadData(sheetName);
+      }
+
+      // Lightbox Functions
+      function openLightbox(previewUrl, caption) {
+        document.getElementById("lightboxIframe").src = previewUrl;
+        document.getElementById("lightboxCaption").innerText =
+          "Bukti Milik: " + caption;
+        document.getElementById("lightbox").style.display = "flex";
+      }
+
+      function closeLightbox() {
+        document.getElementById("lightbox").style.display = "none";
+        document.getElementById("lightboxIframe").src = ""; // Membersihkan iframe agar tidak berat
+      }
+
+      // Fungsi untuk mengambil rekapitulasi secara background
+      async function loadRekap(forceRefresh = false) {
+        const sheets = APP_CONFIG.attendanceCategories.map(
+          (category) => category.id,
+        );
+        let totalPresensi = 0;
+        const TOTAL_TARGET = APP_CONFIG.event.participantCount;
+
+        try {
+          // Ambil semua data sheet melalui cache agar request tidak duplikat
+          const fetchPromises = sheets.map((sheet) =>
+            fetchSheet(sheet, forceRefresh),
+          );
+
+          const allData = await Promise.all(fetchPromises);
+
+          // Proses hasil dan update angka di UI
+          allData.forEach((data, index) => {
+            // Validasi: hanya hitung baris yang ada namanya (mengabaikan baris kosong)
+            const validCount = data.filter(
+              (peserta) =>
+                peserta.Nama &&
+                peserta.Nama !== "#N/A" &&
+                peserta.Nama !== "#REF!" &&
+                peserta.NRP,
+            ).length;
+            totalPresensi += validCount;
+
+            // Update ID sesuai urutan array sheets
+            const idElement = `rek-${sheets[index].toLowerCase()}`;
+            document.getElementById(idElement).innerText = validCount;
+          });
+
+          // Hitung Alpa dan tampilkan
+          const totalAlpa = TOTAL_TARGET - totalPresensi;
+          // Mencegah angka minus jika ada data ganda
+          document.getElementById("rek-alpa").innerText =
+            totalAlpa < 0 ? 0 : totalAlpa;
+        } catch (error) {
+          console.error("Gagal memuat data rekap:", error);
         }
+      }
 
-        // Lightbox Functions
-        function openLightbox(previewUrl, caption) {
-            document.getElementById("lightboxIframe").src = previewUrl;
-            document.getElementById("lightboxCaption").innerText = "Bukti Milik: " + caption;
-            document.getElementById("lightbox").style.display = "flex";
+      function showPendingUpdate() {
+        const button = document.getElementById("pending-update");
+
+        if (button) {
+          button.style.display = "flex";
         }
+      }
 
-        function closeLightbox() {
-            document.getElementById("lightbox").style.display = "none";
-            document.getElementById("lightboxIframe").src = ""; // Membersihkan iframe agar tidak berat
+      function hidePendingUpdate() {
+        const button = document.getElementById("pending-update");
+
+        if (button) {
+          button.style.display = "none";
         }
+      }
 
-        // Fungsi untuk mengambil rekapitulasi secara background
-        async function loadRekap() {
-            const sheets = ['HADIR', 'SAKIT', 'KEAGAMAAN', 'BERDUKA', 'AKADEMIK'];
-            let totalPresensi = 0;
-            const TOTAL_TARGET = 284;
+      function applyPendingUpdate() {
+        if (!pendingDataUpdate) return;
 
-            try {
-                // Fetch semua data sheet secara bersamaan (paralel) agar cepat
-                const fetchPromises = sheets.map(sheet => 
-                    fetch(`${API_URL}?sheet=${sheet}`).then(res => res.json())
-                );
-                
-                const allData = await Promise.all(fetchPromises);
+        const { sheetName, data, snapshot } = pendingDataUpdate;
 
-                // Proses hasil dan update angka di UI
-                allData.forEach((data, index) => {
-                    // Validasi: hanya hitung baris yang ada namanya (mengabaikan baris kosong)
-                    const validCount = data.filter(peserta => 
-                        peserta.Nama && 
-                        peserta.Nama !== "#N/A" && 
-                        peserta.Nama !== "#REF!" && 
-                        peserta.NRP
-                    ).length;
-                    totalPresensi += validCount;
-                    
-                    // Update ID sesuai urutan array sheets
-                    const idElement = `rek-${sheets[index].toLowerCase()}`;
-                    document.getElementById(idElement).innerText = validCount;
-                });
+        // Simpan data terbaru ke cache render.
+        renderedDataSnapshots.set(sheetName, snapshot);
 
-                // Hitung Alpa dan tampilkan
-                const totalAlpa = TOTAL_TARGET - totalPresensi;
-                // Mencegah angka minus jika ada data ganda
-                document.getElementById('rek-alpa').innerText = totalAlpa < 0 ? 0 : totalAlpa;
+        pendingDataUpdate = null;
+        hidePendingUpdate();
 
-            } catch (error) {
-                console.error("Gagal memuat data rekap:", error);
-            }
+        // Paksa loadData melewati pengecekan snapshot sehingga data baru dirender.
+        renderedDataSnapshots.delete(sheetName);
+
+        sheetCache.set(sheetName, {
+          timestamp: Date.now(),
+          promise: Promise.resolve(data),
+        });
+
+        loadData(sheetName);
+      }
+
+      function updateLastSyncedTime() {
+        const timestamp = new Intl.DateTimeFormat("id-ID", {
+          dateStyle: "medium",
+          timeStyle: "medium",
+        }).format(new Date());
+
+        document.getElementById("last-synced").textContent =
+          `Terakhir disinkronkan: ${timestamp}`;
+      }
+
+      let refreshInProgress = false;
+
+      async function refreshData(forceRefresh = false) {
+        if (refreshInProgress) return;
+
+        refreshInProgress = true;
+
+        try {
+          if (forceRefresh) {
+            sheetCache.clear();
+          }
+
+          await Promise.all([loadData(currentTab), loadRekap()]);
+
+          updateLastSyncedTime();
+        } finally {
+          refreshInProgress = false;
         }
+      }
 
-        // Memuat data 'HADIR' dan data REKAP saat halaman pertama kali dibuka
-        window.onload = () => {
-            loadData('HADIR');
-            loadRekap();
-        };
+      async function handleManualRefresh() {
+        const button = document.getElementById("refresh-btn");
+        const icon = button.querySelector("i");
+
+        if (button.disabled || refreshInProgress) return;
+
+        button.disabled = true;
+        icon.classList.add("fa-spin");
+
+        try {
+          await refreshData(true);
+        } finally {
+          icon.classList.remove("fa-spin");
+          button.disabled = false;
+        }
+      }
+
+      const AUTO_REFRESH_INTERVAL = 30_000;
+
+      async function handleAutoRefresh() {
+        // Jangan refresh jika tab browser sedang tidak aktif.
+        if (document.hidden) return;
+
+        const refreshButton = document.getElementById("refresh-btn");
+
+        // Jangan overlap dengan manual refresh.
+        if (refreshButton?.disabled) return;
+
+        await refreshData(true);
+      }
+
+      function scrollToTop() {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+
+      function updateScrollTopButton() {
+        const button = document.getElementById("scroll-top-btn");
+
+        if (!button) return;
+
+        button.style.display = window.scrollY > 500 ? "block" : "none";
+      }
+
+      window.addEventListener("scroll", updateScrollTopButton, {
+        passive: true,
+      });
+
+      // Memuat kategori default dan data rekap saat halaman pertama kali dibuka
+      window.onload = () => {
+        refreshData();
+
+        setInterval(handleAutoRefresh, AUTO_REFRESH_INTERVAL);
+      };
     </script>
-</body>
+  </body>
 </html>
